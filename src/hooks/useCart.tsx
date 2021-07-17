@@ -34,30 +34,34 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const addProduct = async (productId: number) => {
 	try {
-	  const updatedCart = [ ...cart ];
-	  const productExists = updatedCart.find( product => product.id = productId );
-	  const stock = await api.get( `/stock/${ productId }` );
+	  const updatedCart = [...cart];
+	  const productExists = updatedCart.find(product => product.id === productId);
+
+	  const stock = await api.get(`/stock/${productId}`);
+
 	  const stockAmount = stock.data.amount;
 	  const currentAmount = productExists ? productExists.amount : 0;
 	  const amount = currentAmount + 1;
-	  if ( amount > stockAmount ) {
-		toast.error( 'Quantidade solicitada fora de estoque' );
+
+	  if (amount > stockAmount) {
+		toast.error('Quantidade solicitada fora de estoque');
 		return;
 	  }
-	  if ( productExists ) {
+
+	  if (productExists) {
 		productExists.amount = amount;
 	  } else {
-		const product = await api.get( `/products/${ productId }` );
+		const product = await api.get(`/products/${productId}`);
+
 		const newProduct = {
 		  ...product.data,
-		  amount: 1,
-		};
-		updatedCart.push( newProduct );
+		  amount: 1
+		}
+		updatedCart.push(newProduct)
 	  }
-	  setCart( updatedCart );
-	  localStorage.setItem( '@RocketShoes:cart', JSON.stringify( updatedCart ) );
-	}
-	catch {
+	  localStorage.setItem('@RocketShoes:cart', JSON.stringify(updatedCart))
+	  setCart(updatedCart);
+	} catch {
 	  toast.error('Erro na adição do produto');
 	}
   };
